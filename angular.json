@@ -32,6 +32,5 @@
         }
       }
     }
-  },
-  "defaultProject": "angular2-query-builder"
+  }
 }
