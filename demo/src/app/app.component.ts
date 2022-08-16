@@ -304,9 +304,9 @@ export class AppComponent {
   };
 
   public currentConfig: QueryBuilderConfig;
-  public allowRuleset: boolean = true;
+  public allowRuleset = true;
   public allowCollapse: boolean;
-  public persistValueOnFieldChange: boolean = false;
+  public persistValueOnFieldChange = false;
 
   constructor(
     private formBuilder: UntypedFormBuilder
