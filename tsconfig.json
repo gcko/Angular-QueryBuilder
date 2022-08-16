@@ -1,7 +1,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-
     "outDir": "../../out-tsc/lib",
     "declaration": true,
     "inlineSources": true,
@@ -14,13 +13,9 @@
     "noImplicitAny": false,
     "experimentalDecorators": true,
     "lib": [
-      "es5",
-      "es6",
+      "es2020",
       "dom"
     ],
-
-
-
     "baseUrl": "./",
     "downlevelIteration": true,
     "importHelpers": true,

@@ -1,18 +1,17 @@
 {
   "root": true,
-  "ignorePatterns": [
-    "projects/**/*"
-  ],
+  "ignorePatterns": ["**/*"],
   "overrides": [
     {
       "files": [
         "*.ts"
       ],
       "parserOptions": {
-        "project": [
-          "tsconfig.json"
-        ],
-        "createDefaultProgram": true
+        "ecmaVersion": 2020,
+        "ecmaFeatures": {
+          "impliedStrict": true
+        },
+        "createDefaultProgram": false
       },
       "extends": [
         "eslint:recommended",

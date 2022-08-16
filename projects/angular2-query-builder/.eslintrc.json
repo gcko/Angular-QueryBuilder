@@ -10,10 +10,8 @@
       ],
       "parserOptions": {
         "project": [
-          "projects/angular2-query-builder/tsconfig.lib.json",
-          "projects/angular2-query-builder/tsconfig.spec.json"
-        ],
-        "createDefaultProgram": true
+          "projects/angular2-query-builder/tsconfig.*?.json"
+        ]
       },
       "rules": {
         "@typescript-eslint/no-explicit-any": [
