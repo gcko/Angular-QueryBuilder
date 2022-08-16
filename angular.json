@@ -29,18 +29,6 @@
             "tsConfig": "projects/angular2-query-builder/tsconfig.spec.json",
             "karmaConfig": "projects/angular2-query-builder/karma.conf.js"
           }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "projects/angular2-query-builder/tsconfig.lib.json",
-              "projects/angular2-query-builder/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
-          }
         }
       }
     }
