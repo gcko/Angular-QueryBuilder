@@ -13,7 +13,6 @@
     "removeComments": false,
     "noImplicitAny": false,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "lib": [
       "es5",
       "es6",
