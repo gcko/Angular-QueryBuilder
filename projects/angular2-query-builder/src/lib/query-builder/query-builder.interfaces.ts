@@ -7,6 +7,7 @@ export interface RuleSet {
 
 export interface Rule {
   field: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value?: any;
   operator?: string;
   entity?: string;
@@ -14,6 +15,7 @@ export interface Rule {
 
 export interface Option {
   name: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any;
 }
 
@@ -28,7 +30,9 @@ export interface Field {
   nullable?: boolean;
   options?: Option[];
   operators?: string[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   defaultValue?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   defaultOperator?: any;
   entity?: string;
   validator?: (rule: Rule, parent: RuleSet) => unknown | null;
@@ -46,6 +50,7 @@ export interface EntityMap {
 export interface Entity {
   name: string;
   value?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   defaultField?: any;
 }
 
@@ -95,11 +100,14 @@ export interface QueryBuilderConfig {
   addRule?: (parent: RuleSet) => void;
   removeRuleSet?: (ruleset: RuleSet, parent: RuleSet) => void;
   removeRule?: (rule: Rule, parent: RuleSet) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   coerceValueForOperator?: (operator: string, value: any, rule: Rule) => any;
   calculateFieldChangeValue?: (
     currentField: Field,
     nextField: Field,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentValue: any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ) => any;
 }
 
