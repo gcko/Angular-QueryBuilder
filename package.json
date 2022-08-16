@@ -56,10 +56,10 @@
     "test:watch": "ng test --watch=true",
     "tslint": "ng lint"
   },
-  "peerDependencies": {},
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.900.3",
     "@angular-devkit/build-ng-packagr": "~0.900.3",
+    "@angular/animations": "9.0.6",
     "@angular/cli": "^9.0.3",
     "@angular/common": "^9.0.2",
     "@angular/compiler": "^9.0.2",
@@ -73,8 +73,8 @@
     "@types/jasminewd2": "^2.0.3",
     "@types/node": "^12.11.1",
     "codelyzer": "^5.1.2",
-    "copyfiles": "^2.2.0",
     "compodoc": "^0.0.41",
+    "copyfiles": "^2.2.0",
     "core-js": "^2.6.5",
     "gh-pages": "^2.2.0",
     "jasmine-core": "^3.4.0",
@@ -85,15 +85,16 @@
     "karma-jasmine": "^2.0.1",
     "karma-jasmine-html-reporter": "^1.4.0",
     "ng-packagr": "^9.0.0",
-    "sass": "1.54.4",
     "protractor": "^5.4.0",
     "rxjs": "~6.5.4",
+    "sass": "1.54.4",
     "ts-node": "^7.0.0",
     "tslint": "^5.15.0",
     "typescript": "3.7.5",
     "zone.js": "~0.10.2"
   },
   "dependencies": {
+    "@angular/animations": "^9.0.6",
     "tslib": "^1.10.0"
   }
 }
