@@ -152,7 +152,7 @@ import { QueryBuilderClassNames, QueryBuilderConfig } from 'angular2-query-build
   </query-builder>
   `,
   styles: [`
-  /deep/ html {
+  ::ng-deep html {
     font: 14px sans-serif;
     margin: 30px;
   }
