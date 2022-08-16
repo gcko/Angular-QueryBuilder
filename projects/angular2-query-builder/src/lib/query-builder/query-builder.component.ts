@@ -47,16 +47,28 @@ import {
   SimpleChanges,
   TemplateRef,
   ViewChild,
-  ElementRef
+  ElementRef,
+  InjectionToken,
+  Type
 } from '@angular/core';
 
-export const CONTROL_VALUE_ACCESSOR: any = {
+export const CONTROL_VALUE_ACCESSOR: {
+  provide: InjectionToken<(() => void | Validator)[]>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  useExisting: Type<any>;
+  multi: boolean;
+} = {
   provide: NG_VALUE_ACCESSOR,
   useExisting: forwardRef(() => QueryBuilderComponent),
   multi: true
 };
 
-export const VALIDATOR: any = {
+export const VALIDATOR: {
+  provide: InjectionToken<(() => void | Validator)[]>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  useExisting: Type<any>;
+  multi: boolean;
+} = {
   provide: NG_VALIDATORS,
   useExisting: forwardRef(() => QueryBuilderComponent),
   multi: true
@@ -71,6 +83,58 @@ export const VALIDATOR: any = {
 export class QueryBuilderComponent
   implements OnInit, OnChanges, ControlValueAccessor, Validator
 {
+  @Input() disabled: boolean;
+  @Input() data: RuleSet = { condition: 'and', rules: [] };
+
+  @Input() allowRuleset = true;
+
+  @Input() allowCollapse = false;
+  @Input() emptyMessage =
+    'A ruleset cannot be empty. Please add a rule or remove it all together.';
+
+  @Input() classNames: QueryBuilderClassNames;
+
+  @Input() operatorMap: { [key: string]: string[] };
+  @Input() parentValue: RuleSet;
+  @Input() config: QueryBuilderConfig = { fields: {} };
+  @Input() parentArrowIconTemplate: QueryArrowIconDirective;
+  @Input() parentInputTemplates: QueryList<QueryInputDirective>;
+  @Input() parentOperatorTemplate: QueryOperatorDirective;
+  @Input() parentFieldTemplate: QueryFieldDirective;
+  @Input() parentEntityTemplate: QueryEntityDirective;
+  @Input() parentSwitchGroupTemplate: QuerySwitchGroupDirective;
+  @Input() parentButtonGroupTemplate: QueryButtonGroupDirective;
+  @Input() parentRemoveButtonTemplate: QueryRemoveButtonDirective;
+  @Input() parentEmptyWarningTemplate: QueryEmptyWarningDirective;
+  @Input() parentChangeCallback: () => void;
+  @Input() parentTouchedCallback: () => void;
+  @Input() persistValueOnFieldChange = false;
+  @ViewChild('treeContainer', { static: true }) treeContainer: ElementRef;
+
+  @ContentChild(QueryButtonGroupDirective)
+  buttonGroupTemplate: QueryButtonGroupDirective;
+
+  @ContentChild(QuerySwitchGroupDirective)
+  switchGroupTemplate: QuerySwitchGroupDirective;
+
+  @ContentChild(QueryFieldDirective) fieldTemplate: QueryFieldDirective;
+
+  @ContentChild(QueryEntityDirective) entityTemplate: QueryEntityDirective;
+  @ContentChild(QueryOperatorDirective)
+  operatorTemplate: QueryOperatorDirective;
+
+  @ContentChild(QueryRemoveButtonDirective)
+  removeButtonTemplate: QueryRemoveButtonDirective;
+
+  @ContentChild(QueryEmptyWarningDirective)
+  emptyWarningTemplate: QueryEmptyWarningDirective;
+
+  @ContentChildren(QueryInputDirective)
+  inputTemplates: QueryList<QueryInputDirective>;
+
+  @ContentChild(QueryArrowIconDirective)
+  arrowIconTemplate: QueryArrowIconDirective;
+
   public fields: Field[];
   public filterFields: Field[];
   public entities: Entity[];
@@ -107,67 +171,20 @@ export class QueryBuilderComponent
   };
 
   public defaultOperatorMap: { [key: string]: string[] } = {
+    // eslint-disable-next-line id-blacklist
     string: ['=', '!=', 'contains', 'like'],
+    // eslint-disable-next-line id-blacklist
     number: ['=', '!=', '>', '>=', '<', '<='],
     time: ['=', '!=', '>', '>=', '<', '<='],
     date: ['=', '!=', '>', '>=', '<', '<='],
     category: ['=', '!=', 'in', 'not in'],
+    // eslint-disable-next-line id-blacklist
     boolean: ['=']
   };
 
-  @Input() disabled: boolean;
-  @Input() data: RuleSet = { condition: 'and', rules: [] };
-
   // For ControlValueAccessor interface
   public onChangeCallback: () => void;
-  public onTouchedCallback: () => any;
-
-  @Input() allowRuleset = true;
-  @Input() allowCollapse = false;
-  @Input() emptyMessage =
-    'A ruleset cannot be empty. Please add a rule or remove it all together.';
-
-  @Input() classNames: QueryBuilderClassNames;
-  @Input() operatorMap: { [key: string]: string[] };
-  @Input() parentValue: RuleSet;
-  @Input() config: QueryBuilderConfig = { fields: {} };
-  @Input() parentArrowIconTemplate: QueryArrowIconDirective;
-  @Input() parentInputTemplates: QueryList<QueryInputDirective>;
-  @Input() parentOperatorTemplate: QueryOperatorDirective;
-  @Input() parentFieldTemplate: QueryFieldDirective;
-  @Input() parentEntityTemplate: QueryEntityDirective;
-  @Input() parentSwitchGroupTemplate: QuerySwitchGroupDirective;
-  @Input() parentButtonGroupTemplate: QueryButtonGroupDirective;
-  @Input() parentRemoveButtonTemplate: QueryRemoveButtonDirective;
-  @Input() parentEmptyWarningTemplate: QueryEmptyWarningDirective;
-  @Input() parentChangeCallback: () => void;
-  @Input() parentTouchedCallback: () => void;
-  @Input() persistValueOnFieldChange = false;
-
-  @ViewChild('treeContainer', { static: true }) treeContainer: ElementRef;
-
-  @ContentChild(QueryButtonGroupDirective)
-  buttonGroupTemplate: QueryButtonGroupDirective;
-
-  @ContentChild(QuerySwitchGroupDirective)
-  switchGroupTemplate: QuerySwitchGroupDirective;
-
-  @ContentChild(QueryFieldDirective) fieldTemplate: QueryFieldDirective;
-  @ContentChild(QueryEntityDirective) entityTemplate: QueryEntityDirective;
-  @ContentChild(QueryOperatorDirective)
-  operatorTemplate: QueryOperatorDirective;
-
-  @ContentChild(QueryRemoveButtonDirective)
-  removeButtonTemplate: QueryRemoveButtonDirective;
-
-  @ContentChild(QueryEmptyWarningDirective)
-  emptyWarningTemplate: QueryEmptyWarningDirective;
-
-  @ContentChildren(QueryInputDirective)
-  inputTemplates: QueryList<QueryInputDirective>;
-
-  @ContentChild(QueryArrowIconDirective)
-  arrowIconTemplate: QueryArrowIconDirective;
+  public onTouchedCallback: () => RuleSet;
 
   private defaultTemplateTypes: string[] = [
     'string',
@@ -187,7 +204,7 @@ export class QueryBuilderComponent
     'boolean'
   ];
 
-  private defaultEmptyList: any[] = [];
+  private defaultEmptyList: string[] = [];
   private operatorsCache: { [key: string]: string[] };
   private inputContextCache = new Map<Rule, InputContext>();
   private operatorContextCache = new Map<Rule, OperatorContext>();
@@ -198,11 +215,24 @@ export class QueryBuilderComponent
 
   constructor(private changeDetectorRef: ChangeDetectorRef) {}
 
+  // ----------ControlValueAccessor Implementation----------
+  @Input()
+  get value(): RuleSet {
+    return this.data;
+  }
+
+  set value(value: RuleSet) {
+    // When component is initialized without a formControl, null is passed to value
+    this.data = value || { condition: 'and', rules: [] };
+    this.handleDataChange();
+  }
+
   // ----------OnInit Implementation----------
 
   ngOnInit() {}
 
   // ----------OnChanges Implementation----------
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
   ngOnChanges(changes: SimpleChanges) {
     const config = this.config;
@@ -232,9 +262,10 @@ export class QueryBuilderComponent
 
   // ----------Validator Implementation----------
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   validate(control: AbstractControl): ValidationErrors | null {
-    const errors: { [key: string]: any } = {};
-    const ruleErrorStore = [];
+    const errors: { [key: string]: string | string[] } = {};
+    const ruleErrorStore: string[] = [];
     let hasErrors = false;
 
     if (
@@ -254,28 +285,15 @@ export class QueryBuilderComponent
     return hasErrors ? errors : null;
   }
 
-  // ----------ControlValueAccessor Implementation----------
-
-  @Input()
-  get value(): RuleSet {
-    return this.data;
-  }
-
-  set value(value: RuleSet) {
-    // When component is initialized without a formControl, null is passed to value
-    this.data = value || { condition: 'and', rules: [] };
-    this.handleDataChange();
-  }
-
-  writeValue(obj: any): void {
+  writeValue(obj: RuleSet): void {
     this.value = obj;
   }
 
-  registerOnChange(fn: any): void {
+  registerOnChange(fn: (RuleSet) => void): void {
     this.onChangeCallback = () => fn(this.data);
   }
 
-  registerOnTouched(fn: any): void {
+  registerOnTouched(fn: (RuleSet) => RuleSet): void {
     this.onTouchedCallback = () => fn(this.data);
   }
 
@@ -290,7 +308,7 @@ export class QueryBuilderComponent
     return this.disabled;
   };
 
-  findTemplateForRule(rule: Rule): TemplateRef<any> {
+  findTemplateForRule(rule: Rule): TemplateRef<unknown> {
     const type = this.getInputType(rule.field, rule.operator);
     if (type) {
       const queryInput = this.findQueryInput(type);
@@ -386,7 +404,10 @@ export class QueryBuilderComponent
     if (this.config.getOptions) {
       return this.config.getOptions(field);
     }
-    return this.config.fields[field].options || this.defaultEmptyList;
+    return (
+      this.config.fields[field].options ||
+      (this.defaultEmptyList as unknown as Option[])
+    );
   }
 
   getClassNames(...args): string {
@@ -403,7 +424,7 @@ export class QueryBuilderComponent
     if (!entity) {
       return null;
     } else if (entity.defaultField !== undefined) {
-      return this.getDefaultValue(entity.defaultField);
+      return this.getDefaultValue(entity.defaultField) as Field;
     } else {
       const entityFields = this.fields.filter((field) => {
         return field && field.entity === entity.value;
@@ -422,7 +443,7 @@ export class QueryBuilderComponent
 
   getDefaultOperator(field: Field): string {
     if (field && field.defaultOperator !== undefined) {
-      return this.getDefaultValue(field.defaultOperator);
+      return this.getDefaultValue(field.defaultOperator) as string;
     } else {
       const operators = this.getOperators(field.value);
       if (operators && operators.length) {
@@ -442,12 +463,12 @@ export class QueryBuilderComponent
       return;
     }
 
-    parent = parent || this.data;
+    const newParent = parent || this.data;
     if (this.config.addRule) {
-      this.config.addRule(parent);
+      this.config.addRule(newParent);
     } else {
       const field = this.fields[0];
-      parent.rules = parent.rules.concat([
+      newParent.rules = newParent.rules.concat([
         {
           field: field.value,
           operator: this.getDefaultOperator(field),
@@ -466,11 +487,11 @@ export class QueryBuilderComponent
       return;
     }
 
-    parent = parent || this.data;
+    const newParent = parent || this.data;
     if (this.config.removeRule) {
-      this.config.removeRule(rule, parent);
+      this.config.removeRule(rule, newParent);
     } else {
-      parent.rules = parent.rules.filter((r) => r !== rule);
+      newParent.rules = newParent.rules.filter((r) => r !== rule);
     }
     this.inputContextCache.delete(rule);
     this.operatorContextCache.delete(rule);
@@ -487,34 +508,37 @@ export class QueryBuilderComponent
       return;
     }
 
-    parent = parent || this.data;
+    const newParent = parent || this.data;
     if (this.config.addRuleSet) {
-      this.config.addRuleSet(parent);
+      this.config.addRuleSet(newParent);
     } else {
-      parent.rules = parent.rules.concat([{ condition: 'and', rules: [] }]);
+      newParent.rules = newParent.rules.concat([
+        { condition: 'and', rules: [] }
+      ]);
     }
 
     this.handleTouched();
     this.handleDataChange();
   }
 
-  removeRuleSet(ruleset?: RuleSet, parent?: RuleSet): void {
+  removeRuleSet(ruleSet?: RuleSet, parent?: RuleSet): void {
     if (this.disabled) {
       return;
     }
 
-    ruleset = ruleset || this.data;
-    parent = parent || this.parentValue;
+    const newRuleSet = ruleSet || this.data;
+    const newParent = parent || this.parentValue;
     if (this.config.removeRuleSet) {
-      this.config.removeRuleSet(ruleset, parent);
+      this.config.removeRuleSet(newRuleSet, newParent);
     } else {
-      parent.rules = parent.rules.filter((r) => r !== ruleset);
+      newParent.rules = newParent.rules.filter((r) => r !== newRuleSet);
     }
 
     this.handleTouched();
     this.handleDataChange();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   transitionEnd(e: Event): void {
     this.treeContainer.nativeElement.style.maxHeight = null;
   }
@@ -563,7 +587,11 @@ export class QueryBuilderComponent
     this.handleDataChange();
   }
 
-  coerceValueForOperator(operator: string, value: any, rule: Rule): any {
+  coerceValueForOperator(
+    operator: string,
+    value: unknown,
+    rule: Rule
+  ): unknown {
     const inputType: string = this.getInputType(rule.field, operator);
     if (inputType === 'multiselect' && !Array.isArray(value)) {
       return [value];
@@ -645,51 +673,51 @@ export class QueryBuilderComponent
     }
   }
 
-  getDefaultValue(defaultValue: any): any {
+  getDefaultValue(defaultValue: unknown): string | Field {
     switch (typeof defaultValue) {
       case 'function':
         return defaultValue();
       default:
-        return defaultValue;
+        return defaultValue as string | Field;
     }
   }
 
-  getOperatorTemplate(): TemplateRef<any> {
+  getOperatorTemplate(): TemplateRef<unknown> {
     const t = this.parentOperatorTemplate || this.operatorTemplate;
     return t ? t.template : null;
   }
 
-  getFieldTemplate(): TemplateRef<any> {
+  getFieldTemplate(): TemplateRef<unknown> {
     const t = this.parentFieldTemplate || this.fieldTemplate;
     return t ? t.template : null;
   }
 
-  getEntityTemplate(): TemplateRef<any> {
+  getEntityTemplate(): TemplateRef<unknown> {
     const t = this.parentEntityTemplate || this.entityTemplate;
     return t ? t.template : null;
   }
 
-  getArrowIconTemplate(): TemplateRef<any> {
+  getArrowIconTemplate(): TemplateRef<unknown> {
     const t = this.parentArrowIconTemplate || this.arrowIconTemplate;
     return t ? t.template : null;
   }
 
-  getButtonGroupTemplate(): TemplateRef<any> {
+  getButtonGroupTemplate(): TemplateRef<unknown> {
     const t = this.parentButtonGroupTemplate || this.buttonGroupTemplate;
     return t ? t.template : null;
   }
 
-  getSwitchGroupTemplate(): TemplateRef<any> {
+  getSwitchGroupTemplate(): TemplateRef<unknown> {
     const t = this.parentSwitchGroupTemplate || this.switchGroupTemplate;
     return t ? t.template : null;
   }
 
-  getRemoveButtonTemplate(): TemplateRef<any> {
+  getRemoveButtonTemplate(): TemplateRef<unknown> {
     const t = this.parentRemoveButtonTemplate || this.removeButtonTemplate;
     return t ? t.template : null;
   }
 
-  getEmptyWarningTemplate(): TemplateRef<any> {
+  getEmptyWarningTemplate(): TemplateRef<unknown> {
     const t = this.parentEmptyWarningTemplate || this.emptyWarningTemplate;
     return t ? t.template : null;
   }
@@ -806,8 +834,8 @@ export class QueryBuilderComponent
   private calculateFieldChangeValue(
     currentField: Field,
     nextField: Field,
-    currentValue: any
-  ): any {
+    currentValue: unknown
+  ): unknown {
     if (this.config.calculateFieldChangeValue != null) {
       return this.config.calculateFieldChangeValue(
         currentField,
@@ -851,7 +879,7 @@ export class QueryBuilderComponent
     }
   }
 
-  private validateRulesInRuleset(ruleset: RuleSet, errorStore: any[]) {
+  private validateRulesInRuleset(ruleset: RuleSet, errorStore: string[]) {
     if (ruleset && ruleset.rules && ruleset.rules.length > 0) {
       ruleset.rules.forEach((item) => {
         if ((item as RuleSet).rules) {
@@ -861,7 +889,7 @@ export class QueryBuilderComponent
           if (field && field.validator && field.validator.apply) {
             const error = field.validator(item as Rule, ruleset);
             if (error != null) {
-              errorStore.push(error);
+              errorStore.push(error as string);
             }
           }
         }
