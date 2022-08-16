@@ -29,8 +29,23 @@
             "tsConfig": "projects/angular2-query-builder/tsconfig.spec.json",
             "karmaConfig": "projects/angular2-query-builder/karma.conf.js"
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/angular2-query-builder/**/*.ts",
+              "projects/angular2-query-builder/**/*.html"
+            ]
+          }
         }
       }
     }
+  },
+  "cli": {
+    "schematicCollections": [
+      "@angular-eslint/schematics",
+      "@angular-eslint/schematics"
+    ]
   }
 }
