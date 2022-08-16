@@ -1,4 +1,4 @@
-import { FormBuilder, FormControl } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
 import { Component } from '@angular/core';
 import { QueryBuilderClassNames, QueryBuilderConfig } from 'angular2-query-builder';
 
@@ -189,7 +189,7 @@ import { QueryBuilderClassNames, QueryBuilderConfig } from 'angular2-query-build
   `]
 })
 export class AppComponent {
-  public queryCtrl: FormControl;
+  public queryCtrl: UntypedFormControl;
 
   public bootstrapClassNames: QueryBuilderClassNames = {
     removeIcon: 'fa fa-minus',
@@ -309,7 +309,7 @@ export class AppComponent {
   public persistValueOnFieldChange: boolean = false;
 
   constructor(
-    private formBuilder: FormBuilder
+    private formBuilder: UntypedFormBuilder
   ) {
     this.queryCtrl = this.formBuilder.control(this.query);
     this.currentConfig = this.config;
