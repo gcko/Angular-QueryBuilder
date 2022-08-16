@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 
 import { QueryBuilderComponent } from './query-builder/query-builder.component';
 
@@ -15,10 +15,7 @@ import { QueryRemoveButtonDirective } from './query-builder/query-remove-button.
 import { QueryEmptyWarningDirective } from './query-builder/query-empty-warning.directive';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule
-  ],
+  imports: [CommonModule, FormsModule],
   declarations: [
     QueryBuilderComponent,
     QueryInputDirective,
@@ -44,4 +41,4 @@ import { QueryEmptyWarningDirective } from './query-builder/query-empty-warning.
     QueryArrowIconDirective
   ]
 })
-export class QueryBuilderModule { }
+export class QueryBuilderModule {}

@@ -17,7 +17,7 @@
     float: left;
     margin: 4px 6px 4px 0;
     transform: rotate(90deg);
-    transition: linear 0.25s transform;
+    transition: transform linear 0.25s;
     cursor: pointer;
 
     &.q-collapsed {
@@ -167,7 +167,7 @@
   .q-tree-container {
     width: 100%;
     overflow: hidden;
-    transition: ease-in 0.25s max-height;
+    transition: max-height ease-in 0.25s;
 
     &.q-collapsed {
       max-height: 0 !important;
