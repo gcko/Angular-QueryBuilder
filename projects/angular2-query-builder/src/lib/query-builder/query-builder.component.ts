@@ -32,7 +32,8 @@ import {
   ArrowIconContext,
   Rule,
   RuleSet,
-  EmptyWarningContext
+  EmptyWarningContext,
+  AllowableValues
 } from './query-builder.interfaces';
 import {
   ChangeDetectorRef,
@@ -472,7 +473,7 @@ export class QueryBuilderComponent
         {
           field: field.value,
           operator: this.getDefaultOperator(field),
-          value: this.getDefaultValue(field.defaultValue),
+          value: this.getDefaultValue(field.defaultValue) as AllowableValues,
           entity: field.entity
         }
       ]);
@@ -591,12 +592,12 @@ export class QueryBuilderComponent
     operator: string,
     value: unknown,
     rule: Rule
-  ): unknown {
+  ): AllowableValues {
     const inputType: string = this.getInputType(rule.field, operator);
     if (inputType === 'multiselect' && !Array.isArray(value)) {
-      return [value];
+      return [value] as Array<string> | Array<number>;
     }
-    return value;
+    return value as AllowableValues;
   }
 
   changeInput(): void {
@@ -673,12 +674,12 @@ export class QueryBuilderComponent
     }
   }
 
-  getDefaultValue(defaultValue: unknown): string | Field {
+  getDefaultValue(defaultValue: unknown): AllowableValues | Field {
     switch (typeof defaultValue) {
       case 'function':
-        return defaultValue();
+        return defaultValue() as AllowableValues | Field;
       default:
-        return defaultValue as string | Field;
+        return defaultValue as AllowableValues;
     }
   }
 
@@ -834,8 +835,8 @@ export class QueryBuilderComponent
   private calculateFieldChangeValue(
     currentField: Field,
     nextField: Field,
-    currentValue: unknown
-  ): unknown {
+    currentValue: AllowableValues
+  ): AllowableValues {
     if (this.config.calculateFieldChangeValue != null) {
       return this.config.calculateFieldChangeValue(
         currentField,
@@ -859,7 +860,7 @@ export class QueryBuilderComponent
     }
 
     if (nextField && nextField.defaultValue !== undefined) {
-      return this.getDefaultValue(nextField.defaultValue);
+      return this.getDefaultValue(nextField.defaultValue) as AllowableValues;
     }
 
     return undefined;
